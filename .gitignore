@@ -142,5 +142,5 @@ run.py
 # Generated summary output (not tracked)
 temp/
 
-/backend/storage/*
-/backend/chroma_store/*
+backend/storage/*
+backend/chroma_store/*
