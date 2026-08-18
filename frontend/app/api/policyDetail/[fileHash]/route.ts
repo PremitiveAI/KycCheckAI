@@ -1,0 +1,32 @@
+import { NextResponse } from "next/server";
+import { API_URL,API_TOKEN } from "@/app/utils/api";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(
+  request: Request,
+  context: { params: Promise<{ fileHash: string }> } // ✅ params is a Promise
+) {
+  try {
+    const { fileHash } = await context.params; // ✅ unwrap the promise
+
+    if (!fileHash) {
+      return NextResponse.json({ detail: "fileHash not provided" }, { status: 400 });
+    }
+
+    const res = await fetch(`${API_URL}query?file_hash=${fileHash}`, {
+      cache: "no-store",
+      headers: {
+        "Content-Type": "application/json",
+        "PK-apiToken": API_TOKEN,
+      },
+
+    });
+    const data = await res.json();
+
+    return NextResponse.json(data);
+  } catch (error) {
+    console.error("Policy Detail API Error:", error);
+    return NextResponse.json({ detail: "Internal server error" }, { status: 500 });
+  }
+}

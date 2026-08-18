@@ -1,0 +1,11 @@
+# 1. craete virtual environment
+python -m venv venv
+
+# 2. Activate virtual environment (Windows)
+.\venv\Scripts\activate
+
+# 3. Pip update
+python -m pip install --upgrade pip
+
+# 4. now torch install
+pip install torch==2.9.1 torchaudio==2.9.1 --index-url https://download.pytorch.org/whl/cpu
