@@ -143,3 +143,4 @@ run.py
 temp/
 
 /backend/storage/*
+/backend/chroma_store/*
