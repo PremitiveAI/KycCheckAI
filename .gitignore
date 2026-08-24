@@ -148,3 +148,9 @@ backend/storage/*
 backend/vector_db/*
 backend/app/chroma_store/*
 backend/app/uploaded_pdfs/*
+
+
+
+
+# Internal audit notes - never published
+AUDIT.md
