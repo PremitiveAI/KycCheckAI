@@ -4,10 +4,16 @@ An employee-KYC platform: upload identity and credential documents, extract stru
 vision LLM, persist them into typed tables, and retrieve them by natural-language query using vector
 search with fuzzy re-ranking.
 
-| Application | Technology | Location |
-| ----------- | ---------- | -------- |
-| Backend | Python 3.11 · FastAPI · SQLAlchemy 2.x · **MySQL/MariaDB** · ChromaDB | [`backend/`](backend/) |
-| Frontend | Next.js 16 (App Router) · React 19 · TypeScript | [`frontend/`](frontend/) |
+| Application | Technology                                                            | Location                 |
+| ----------- | --------------------------------------------------------------------- | ------------------------ |
+| Backend     | Python 3.11 · FastAPI · SQLAlchemy 2.x · **MySQL/MariaDB** · ChromaDB | [`backend/`](backend/)   |
+| Frontend    | Next.js 16 (App Router) · React 19 · TypeScript                       | [`frontend/`](frontend/) |
+
+---
+
+## KYC Check AI & Document RAG Demo
+
+[![KYC Check AI Demo](https://img.youtube.com/vi/hx19Rb08Za0/maxresdefault.jpg)](https://www.youtube.com/watch?v=hx19Rb08Za0)
 
 ---
 
@@ -57,11 +63,11 @@ Detail: [System overview](docs/architecture/system-overview.md) ·
 
 The codebase contains three distinct document modules at very different maturity levels.
 
-| Module | What it does | Status | Documentation |
-| ------ | ------------ | ------ | ------------- |
-| **KYC** | Employee document intake, OCR, classification, field extraction into five typed tables | ✅ **Live** — `/KYC/*` registered | [modules/kyc.md](docs/modules/kyc.md) |
-| **Document RAG** | Embedding + vector retrieval over extracted KYC documents, with fuzzy re-ranking | ✅ **Live** — serves `GET /KYC/search` | [modules/document-rag.md](docs/modules/document-rag.md) |
-| **Policy** | Insurance-policy extraction and Q&A over uploaded PDFs | ❌ **Not wired** — routers commented out of `main.py`, service unreferenced | [modules/policy.md](docs/modules/policy.md) |
+| Module           | What it does                                                                           | Status                                                                      | Documentation                                           |
+| ---------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **KYC**          | Employee document intake, OCR, classification, field extraction into five typed tables | ✅ **Live** — `/KYC/*` registered                                           | [modules/kyc.md](docs/modules/kyc.md)                   |
+| **Document RAG** | Embedding + vector retrieval over extracted KYC documents, with fuzzy re-ranking       | ✅ **Live** — serves `GET /KYC/search`                                      | [modules/document-rag.md](docs/modules/document-rag.md) |
+| **Policy**       | Insurance-policy extraction and Q&A over uploaded PDFs                                 | ❌ **Not wired** — routers commented out of `main.py`, service unreferenced | [modules/policy.md](docs/modules/policy.md)             |
 
 > The navigation labels do not match the modules. The sidebar item **"KYC"** calls a `documents/*` API
 > that does not exist, while the sidebar item **"Employee"** calls the working `/KYC/*` API. See
@@ -95,13 +101,13 @@ Detail: [modules/kyc.md](docs/modules/kyc.md) · [modules/document-rag.md](docs/
 
 ## Prerequisites
 
-| Requirement | Version | Source |
-| ----------- | ------- | ------ |
-| Python | **3.11** | `backend/dockerfile` (`python:3.11-slim`) |
-| MySQL / MariaDB | 5.7+ / 10.x | `mysql+pymysql` driver |
-| Node.js | — | **Not verified from the current implementation** — no engines field, no `.nvmrc` |
-| npm | — | `package-lock.json` present |
-| Google Gemini API key | — | Required — used for OCR, classification and extraction |
+| Requirement           | Version     | Source                                                                           |
+| --------------------- | ----------- | -------------------------------------------------------------------------------- |
+| Python                | **3.11**    | `backend/dockerfile` (`python:3.11-slim`)                                        |
+| MySQL / MariaDB       | 5.7+ / 10.x | `mysql+pymysql` driver                                                           |
+| Node.js               | —           | **Not verified from the current implementation** — no engines field, no `.nvmrc` |
+| npm                   | —           | `package-lock.json` present                                                      |
+| Google Gemini API key | —           | Required — used for OCR, classification and extraction                           |
 
 Full detail: [setup/prerequisites.md](docs/setup/prerequisites.md)
 
@@ -198,12 +204,12 @@ response uses a fixed envelope returned with **HTTP 200**, including errors:
 { "Success": null,                           "Code": 4002, "Error": { "message": "…" } }
 ```
 
-| Group | Prefix | Endpoints | Reference |
-| ----- | ------ | --------: | --------- |
-| User & auth | `/user` | 10 | [user-auth.md](docs/api/user-auth.md) |
-| Masters | `/master` | 8 | [masters.md](docs/api/masters.md) |
-| Admin | `/admin_user` | 2 | [admin.md](docs/api/admin.md) |
-| Employee KYC | `/KYC` | 7 | [kyc.md](docs/api/kyc.md) |
+| Group        | Prefix        | Endpoints | Reference                             |
+| ------------ | ------------- | --------: | ------------------------------------- |
+| User & auth  | `/user`       |        10 | [user-auth.md](docs/api/user-auth.md) |
+| Masters      | `/master`     |         8 | [masters.md](docs/api/masters.md)     |
+| Admin        | `/admin_user` |         2 | [admin.md](docs/api/admin.md)         |
+| Employee KYC | `/KYC`        |         7 | [kyc.md](docs/api/kyc.md)             |
 
 **27 live endpoints + `GET /`.** Twelve more exist in unregistered routers.
 
@@ -221,20 +227,20 @@ pipeline. `backend/test.db` is a 0-byte file. See [testing-status.md](docs/testi
 
 ## Documentation
 
-| Area | Entry point |
-| ---- | ----------- |
-| Index | [docs/README.md](docs/README.md) |
-| Architecture | [docs/architecture/](docs/architecture/) |
-| Modules — KYC · RAG · Policy | [docs/modules/](docs/modules/) |
-| Setup | [docs/setup/](docs/setup/) |
-| API reference | [docs/api/](docs/api/) |
-| Database schema | [docs/database/schema.md](docs/database/schema.md) |
-| Security | [docs/security/authentication-and-authorization.md](docs/security/authentication-and-authorization.md) |
-| Integrations | [docs/integrations/](docs/integrations/) |
-| Roadmap | [docs/roadmap/upcoming-features.md](docs/roadmap/upcoming-features.md) |
-| Testing | [docs/testing/testing-status.md](docs/testing/testing-status.md) |
-| Troubleshooting | [docs/troubleshooting/common-issues.md](docs/troubleshooting/common-issues.md) |
-| **Code audit — 26 confirmed issues** | [AUDIT.md](AUDIT.md) |
+| Area                                 | Entry point                                                                                            |
+| ------------------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Index                                | [docs/README.md](docs/README.md)                                                                       |
+| Architecture                         | [docs/architecture/](docs/architecture/)                                                               |
+| Modules — KYC · RAG · Policy         | [docs/modules/](docs/modules/)                                                                         |
+| Setup                                | [docs/setup/](docs/setup/)                                                                             |
+| API reference                        | [docs/api/](docs/api/)                                                                                 |
+| Database schema                      | [docs/database/schema.md](docs/database/schema.md)                                                     |
+| Security                             | [docs/security/authentication-and-authorization.md](docs/security/authentication-and-authorization.md) |
+| Integrations                         | [docs/integrations/](docs/integrations/)                                                               |
+| Roadmap                              | [docs/roadmap/upcoming-features.md](docs/roadmap/upcoming-features.md)                                 |
+| Testing                              | [docs/testing/testing-status.md](docs/testing/testing-status.md)                                       |
+| Troubleshooting                      | [docs/troubleshooting/common-issues.md](docs/troubleshooting/common-issues.md)                         |
+| **Code audit — 26 confirmed issues** | [AUDIT.md](AUDIT.md)                                                                                   |
 
 ---
 
