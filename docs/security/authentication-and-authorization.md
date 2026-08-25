@@ -87,7 +87,43 @@ request.state.userId = "U-98WZ41BUTTOM"   # line 65 — overwrites the middlewar
 All documents are written under one tenant and the search filter `where={"userId": …}` is effectively
 a constant. Multi-tenancy is defeated at both write and read.
 
-### 2. The `/storage` mount is not behind the auth layers — technical observation
+### 2. Logout never invalidates the server-side session — High
+
+`frontend/app/api/logout/route.ts` builds an axios config then **never executes it**. It deletes
+cookies and returns success. The `tbl_users_sessions` row stays `status=1` — a captured token remains
+valid indefinitely. The target path is also wrong (`logout`, not `user/logout`).
+
+### 3. No frontend route guard — Medium
+
+No `middleware.ts`; a single layout. `(auth)` is a Next.js route group, which affects URLs only. Pages
+render for unauthenticated visitors; only the API handlers check the cookie, so pages load and then
+fail to populate.
+
+### 4. Password change and both OTP flows are unreachable — Medium
+
+`/api/change-password`, `/api/generate-otp` and `/api/validate-otp` omit the `user/` prefix and 404.
+See [../api/frontend-contract-map.md](../api/frontend-contract-map.md).
+
+### 5. Dead crypto path — Low
+
+`login/route.ts` computes `const encryptedToken = encrypt(token)` using `utils/crypto.ts`, then stores
+the **raw** token in the cookie. The encrypted value is discarded.
+
+### 6. Logout clears the wrong cookie — Low
+
+Login sets `username`; logout deletes `user_email`. The `username` cookie persists after logout.
+
+### 7. All errors return HTTP 200 — Medium
+
+Clients must inspect `Code`. Several frontend handlers only check `res.ok`, so auth failures surface as
+empty screens rather than redirects.
+
+## Technical observations
+
+Not weaknesses, and not compliance findings — facts about how the system is wired that are
+worth knowing before deployment.
+
+### The `/storage` mount sits outside both auth layers
 
 `app.mount("/storage", StaticFiles(directory="storage"))` is a `StaticFiles` mount. It sits outside
 both auth layers: `UserApiVerifyMiddleware` does not apply to it and it has no `verify_session`
@@ -104,37 +140,6 @@ It becomes a genuine access-control concern only once the directory holds real u
 deployment is ever pointed at production data, put `/storage` behind the same session check as the
 protected routers, or authenticate it at the proxy, before that happens.
 
-### 3. Logout never invalidates the server-side session — High
-
-`frontend/app/api/logout/route.ts` builds an axios config then **never executes it**. It deletes
-cookies and returns success. The `tbl_users_sessions` row stays `status=1` — a captured token remains
-valid indefinitely. The target path is also wrong (`logout`, not `user/logout`).
-
-### 4. No frontend route guard — Medium
-
-No `middleware.ts`; a single layout. `(auth)` is a Next.js route group, which affects URLs only. Pages
-render for unauthenticated visitors; only the API handlers check the cookie, so pages load and then
-fail to populate.
-
-### 5. Password change and both OTP flows are unreachable — Medium
-
-`/api/change-password`, `/api/generate-otp` and `/api/validate-otp` omit the `user/` prefix and 404.
-See [../api/frontend-contract-map.md](../api/frontend-contract-map.md).
-
-### 6. Dead crypto path — Low
-
-`login/route.ts` computes `const encryptedToken = encrypt(token)` using `utils/crypto.ts`, then stores
-the **raw** token in the cookie. The encrypted value is discarded.
-
-### 7. Logout clears the wrong cookie — Low
-
-Login sets `username`; logout deletes `user_email`. The `username` cookie persists after logout.
-
-### 8. All errors return HTTP 200 — Medium
-
-Clients must inspect `Code`. Several frontend handlers only check `res.ok`, so auth failures surface as
-empty screens rather than redirects.
-
 ## Roles and permissions
 
 `PK-role` is accepted by `SwaggerAPIHeaders` and forwarded by several frontend handlers as `"User"`,
@@ -145,7 +150,7 @@ authorization. There is no role or permission enforcement anywhere.
 
 1. Do not expose port 8000 publicly — only the Next.js port needs to be reachable.
 2. **Authenticate `/storage`, or block it at the proxy, before pointing this deployment at real
-   uploads** — see observation 2. It is not urgent while the directory holds only the synthetic
+   uploads** — see Technical observations. It is not urgent while the directory holds only the synthetic
    development fixtures.
 3. Fix the logout call so sessions are actually invalidated.
 4. Add `middleware.ts` covering the `(auth)` routes.
