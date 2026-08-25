@@ -154,10 +154,12 @@ Working as implemented. `userId` is hard-coded to `"U-98WZ41BUTTOM"` at `kyc_rou
 and again at line 65 for search, where it overwrites the middleware value.
 [AUDIT.md](../../AUDIT.md) issue 1.
 
-## Uploaded PAN/Aadhaar are downloadable without logging in
+## Files under `/storage` are downloadable without logging in
 
-Working as implemented, and a real exposure. `/storage` is a `StaticFiles` mount. Block it at the proxy
-until fixed. [AUDIT.md](../../AUDIT.md) issue 2.
+Working as implemented. `/storage` is a `StaticFiles` mount, so it bypasses `UserApiVerifyMiddleware`
+and `verify_session`. The directory holds synthetic development fixtures, so nothing personal is
+reachable today; authenticate the mount or block it at the proxy before the deployment serves real
+uploads. [AUDIT.md](../../AUDIT.md) issue 2.
 
 ---
 

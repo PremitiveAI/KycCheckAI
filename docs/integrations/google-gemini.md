@@ -122,6 +122,10 @@ Nothing redacts anything, and there is no configuration flag to disable it. For 
 data-residency and privacy decision that should be made explicitly, not inherited by default. India's
 DPDP Act and comparable regimes treat Aadhaar and PAN as sensitive personal data.
 
+This is a property of the integration to decide on before production, not a description of anything
+that has happened: the documents processed so far are the synthetic development fixtures described in
+[../testing/testing-status.md](../testing/testing-status.md).
+
 ## Changing the model
 
 ```ini

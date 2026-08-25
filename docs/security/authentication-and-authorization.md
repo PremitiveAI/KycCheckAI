@@ -87,11 +87,22 @@ request.state.userId = "U-98WZ41BUTTOM"   # line 65 — overwrites the middlewar
 All documents are written under one tenant and the search filter `where={"userId": …}` is effectively
 a constant. Multi-tenancy is defeated at both write and read.
 
-### 2. Uploaded identity documents are served without authentication — High
+### 2. The `/storage` mount is not behind the auth layers — technical observation
 
-`app.mount("/storage", StaticFiles(directory="storage"))`. PAN cards, Aadhaar cards, resumes and
-address proofs are downloadable by anyone who can reach the backend. Paths are guessable because the
-`userId` segment is a fixed constant.
+`app.mount("/storage", StaticFiles(directory="storage"))` is a `StaticFiles` mount. It sits outside
+both auth layers: `UserApiVerifyMiddleware` does not apply to it and it has no `verify_session`
+dependency, so a request to a `/storage/...` path returns the file to anyone who can reach the
+backend port. Paths are enumerable in practice because the `userId` segment is currently the fixed
+constant from issue 1.
+
+Stated as a fact about the routing, not as a compliance or privacy finding: the files served today
+are the synthetic development fixtures described in
+[../testing/testing-status.md](../testing/testing-status.md), so no personal data is exposed by the
+current contents of the directory.
+
+It becomes a genuine access-control concern only once the directory holds real uploads. If this
+deployment is ever pointed at production data, put `/storage` behind the same session check as the
+protected routers, or authenticate it at the proxy, before that happens.
 
 ### 3. Logout never invalidates the server-side session — High
 
@@ -133,7 +144,9 @@ authorization. There is no role or permission enforcement anywhere.
 ## Deployment guidance
 
 1. Do not expose port 8000 publicly — only the Next.js port needs to be reachable.
-2. **Block or authenticate `/storage` at the proxy** until issue 2 is fixed.
+2. **Authenticate `/storage`, or block it at the proxy, before pointing this deployment at real
+   uploads** — see observation 2. It is not urgent while the directory holds only the synthetic
+   development fixtures.
 3. Fix the logout call so sessions are actually invalidated.
 4. Add `middleware.ts` covering the `(auth)` routes.
 5. Replace the hard-coded `userId` with `request.state.userId`.

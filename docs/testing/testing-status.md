@@ -40,13 +40,17 @@ Swagger is of limited help — `FastAPI()` is constructed without metadata and n
 
 ## Test data
 
-No fixtures or factories exist. The repository does contain real uploaded artefacts under
+No automated fixtures or factories exist, but the repository does carry sample documents under
 `backend/storage/U-98WZ41BUTTOM/` and `backend/storage/U-UCLHKV1IAPK8/`, plus policy PDFs and JSON in
 `backend/app/uploaded_pdfs/`.
 
-> **These are real KYC documents.** Before using any of them as test fixtures, or committing them,
-> confirm they contain no genuine personal data — they are PAN cards, Aadhaar cards and resumes by
-> design.
+These are **synthetic development fixtures** — sample PAN cards, Aadhaar cards, resumes and address
+proofs created for development and testing. They contain no real or production identity data, so they
+are safe to keep in the repository and to use directly when writing the tests below.
+
+They are, in fact, the most useful asset here for building coverage: recorded OCR text from these
+samples gives `extract_details` a realistic input per document type without needing any live
+document.
 
 ## Risk assessment
 

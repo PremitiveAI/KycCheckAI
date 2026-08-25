@@ -156,6 +156,6 @@ embeddings that still match searches, and there is **no re-index command** to re
 | Password change, OTP and logout all 404 | Handlers omit the `user/` prefix |
 | Logout appears to work but the session stays valid | The request is never sent |
 | All documents appear under one user | `userId` is hard-coded to `U-98WZ41BUTTOM` |
-| Uploaded PAN/Aadhaar are downloadable without a token | `/storage` is a public static mount |
+| Files under `/storage` are downloadable without a token | `StaticFiles` mount, outside both auth layers |
 | Adding a model column has no effect | No migrations — `create_all` only creates missing tables |
 | `search-excel` shows the backend in an iframe | Stub page pointing at `http://localhost:8000` |

@@ -253,7 +253,10 @@ pipeline. `backend/test.db` is a 0-byte file. See [testing-status.md](docs/testi
   share one tenant. [AUDIT.md](AUDIT.md) issue 1.
 - **Logout never reaches the backend** — the handler builds the request but never sends it, so server
   sessions are never invalidated. [AUDIT.md](AUDIT.md) issue 3.
-- **Uploaded PAN, Aadhaar and resumes are served without authentication** via the `/storage` mount.
+- **The `/storage` mount sits outside both auth layers** — it is a `StaticFiles` mount with no
+  middleware and no session dependency, so uploaded files are reachable without a token. The
+  directory currently holds only synthetic development fixtures; authenticate it before pointing the
+  deployment at real uploads.
 - **No route guard** — `(auth)` is a naming convention; there is no `middleware.ts`.
 - **The Policy module is not wired in** — its three routers are commented out and its service is
   unreferenced and contains four defects.
